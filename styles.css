@@ -1,8 +1,17 @@
-#addBorder {
-	border-style: solid;
+#data{
+	width:72%;
+	display:inline-block;
+	vertical-align:top;
+	word-break:break-all;
 }
 #commandList{
 	text-align:center;
+	width:25%;
+	display:inline-block;
+}
+#program{
+	width:100%;
+	min-height:50px;
 }
 .border {
 	border-style: solid;

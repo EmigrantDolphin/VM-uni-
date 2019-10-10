@@ -44,11 +44,19 @@ function JMP(curCommandAddress, constant){
 	
 	return curCommandAddress;
 }
-function JZ(){
-	
+function JZ(curCommandAddress, constant, flag){
+	if (flag)
+		curCommandAddress = JMP(curCommandAddress, constant);
+	else
+		curCommandAddress += 2;
+	return curCommandAddress;
 }
-function JNZ(){
-	
+function JNZ(curCommandAddress, constant, flag){
+	if (!flag)
+		curCommandAddress = JMP(curCommandAddress, constant);
+	else
+		curCommandAddress += 2;
+	return curCommandAddress;
 }
 function JFE(curCommandAddress, constant, flag){
 	if (flag)

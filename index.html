@@ -7,8 +7,10 @@
 	<body onload="onLoad()">
 		<div id="out">
 		</div>
-		<b>Select .bin command file:</b> <input type="file" id="binFile"><br>
-		<b>Select file with data to work on: </b> <input type="file" id="dataFile">
+		<div id="fileUploadTemplate">
+			<b>Select .bin command file:</b> <input type="file" id="binFile"><br>
+			<b>Select file with data to work on: </b> <input type="file" id="dataFile">
+		</div>
 		<div id="program" class="border">
 			Program
 		</div>
@@ -18,12 +20,14 @@
 		<button onclick="nextButton()">Next Action</button>
 		<button onclick="runButton()">Run Actions</button>
 		<button onclick="stopButton()">Stop Actions</button>
+		<button onclick="fastButton()">Fast Actions</button>
+		<button onclick="resetButton()">Reset</button>
 		<div style="width:100%">
 			<span id="commandList" class="border">
 				js loads command names here
 			</span>
 			<span id="data" class="border">
-				<div id="inData" class="border">
+				<div id="inData" class="border" style="min-height:20px">
 					Input
 				</div>
 				<div id="outData" class="border" style="min-height:20px">

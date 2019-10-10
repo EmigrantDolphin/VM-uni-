@@ -1,6 +1,7 @@
 const commandsArr = ["INC 01", "DEC 02", "MOV 03", "MOVC 04", "LSL 05", "LSR 06", "JMP 07", 
 					 "JZ 08", "JNZ 09", "JFE 0a", "RET 0b", "ADD 0c", "SUB 0d", "XOR 0e", 
 					 "OR 0f", "IN 10", "OUT 11"];
+var fileUploadTemplate = "";
 var programNum = [];
 var registersNum = [];
 const registerNum = 16;
@@ -8,15 +9,19 @@ var curCommandAddress = 0;
 var inputData = "";
 var inputDataHead = 0;
 var outputData = "";
+var fastMode = false;
 
 var interval;
 const intervalDuration = 1;
 
+var exitFlag = false;
+var eofFlag = false
 var flag = false;
 
 function onLoad(){
 	fillCommandList();
 	fillRegisterLine();
+	fileUploadTemplate = document.getElementById("fileUploadTemplate").innerHTML;
 	document.getElementById("binFile").addEventListener('change', getBinFile, false);	
 	document.getElementById("dataFile").addEventListener('change', getDataFile, false);
 }
@@ -39,6 +44,33 @@ function runButton(){
 }
 function stopButton(){
 	clearInterval(interval);
+}
+function fastButton(){
+	fastMode = true;
+	while(!exitFlag)
+		nextButton();
+}
+
+function resetButton(){
+	programNum = [];
+	registersNum = [];
+	curCommandAddress = 0;
+	inputData = "";
+	inputDataHead = 0;
+	outputData = "";
+	exitFlag = false;
+	flag = false;
+	eofFlag = false;
+	fastMode = false;
+	updateRegisters();
+	updateProgram();
+	document.getElementById("outData").innerHTML = outputData;
+	document.getElementById("fileUploadTemplate").innerHTML = fileUploadTemplate;
+	document.getElementById("binFile").addEventListener('change', getBinFile, false);	
+	document.getElementById("dataFile").addEventListener('change', getDataFile, false);
+	updateInData();
+	stopButton();
+	updateCommandList();
 }
 
 function nextButton(){	
@@ -72,18 +104,18 @@ function nextButton(){
 			curCommandAddress = JMP(curCommandAddress, programNum[curCommandAddress+1]);
 			break;
 		case 8:
-			JZ();
-			curCommandAddress += 2;
+			curCommandAddress = JZ(curCommandAddress, programNum[curCommandAddress+1], flag);
 			break;
 		case 9:
-			JNZ();
-			curCommandAddress += 2;
+			curCommandAddress = JNZ(curCommandAddress, programNum[curCommandAddress+1], flag);
 			break;
 		case 10:
-			curCommandAddress = JFE(curCommandAddress, programNum[curCommandAddress+1], flag);
+			curCommandAddress = JFE(curCommandAddress, programNum[curCommandAddress+1], eofFlag);
 			break;
 		case 11:
 			RET(interval);
+			document.getElementById("outData").innerHTML = outputData;
+			exitFlag = true;
 			break;
 		case 12:
 			ADD(registersNum, programNum[curCommandAddress+1]);
@@ -105,23 +137,37 @@ function nextButton(){
 			IN(registersNum, programNum[curCommandAddress+1], inputData, inputDataHead);
 			inputDataHead++;
 			curCommandAddress += 2;
+			if (inputDataHead >= inputData.length)
+				eofFlag = true;
 			break;
 		case 17:
 			outputData += OUT(registersNum, programNum[curCommandAddress+1]);
 			curCommandAddress += 2;
-			if (inputDataHead >= inputData.length)
-				flag = true;
 			break;
 	}
-	updateRegisters();
-	updateProgram();
-	document.getElementById("outData").innerHTML = outputData;
-	updateInData();
+	if (!fastMode){
+		updateRegisters();
+		updateProgram();
+		document.getElementById("outData").innerHTML = outputData;
+		updateInData();
+		updateCommandList();
+	}
 }
 
 function updateInData(){
 	var text = "<span style=\"background-color:yellow\">" + inputData.substr(0, inputDataHead) + "</span>" + inputData.substr(inputDataHead);
 	document.getElementById("inData").innerHTML = text;
+}
+
+function updateCommandList(){
+	let text = "";
+	for (var i = 0; i < commandsArr.length; i++){
+		if ( i+1 === programNum[curCommandAddress] )
+			text += "<div style=\"background-color:yellow\">" + commandsArr[i] + "</div>";
+		else
+			text += "<div>" + commandsArr[i] + "</div>";
+	}
+	document.getElementById("commandList").innerHTML = text;
 }
 
 function updateProgram(){

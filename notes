@@ -1,0 +1,62 @@
+decryptor
+r0 = 40
+in -> r1
+if (end of file) jump ret
+in -> r2
+in -> r3
+r2 = r2 - r0
+r3 = r3 - r0
+r3 = r3 << 1
+r3 = r3 << 1
+r3 = r3 << 1
+r3 = r3 << 1
+r2 = r2 | r3
+r2 = r2 ^ r1
+out r2
+jump to in -> r1
+ret
+
+encryptor
+in -> r2
+if (end of file) jump ret
+r1 = rand
+r2 = r2 ^ r1
+r0 = 15 (00001111)  |
+r3 = r0			    |
+r3 = r3 ^ r2        | splitting 4 bits for r2 and r3 for OR in decryptor
+r2 = r2 & r0	    |
+r3 = r3 >>> 1
+r3 = r3 >>> 1
+r3 = r3 >>> 1
+r3 = r3 >>> 1
+r0 = 40
+r3 = r3 + r0
+r2 = r2 + r0
+out r1
+out r2
+out r3
+jump to in -> r2
+ret
+
+encryptor hex
+10 02
+0A 24
+12 01
+0E 12
+04 0f
+03 03
+0E 23
+13 02
+06 03
+06 03
+06 03
+06 03
+04 40
+0C 03
+0C 02
+11 01
+11 02
+11 03
+07 DC
+0b 00
+

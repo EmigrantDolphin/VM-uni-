@@ -96,3 +96,12 @@ function OUT(registersNum, constant){
 	let rX = getRX(constant);
 	return String.fromCharCode(registersNum[rX]);
 }
+function RAND(registersNum, constant){
+	let rX = getRX(constant);
+	registersNum[rX] = Math.floor(Math.random() * 28)+65;
+}
+function AND(registersNum, constant){
+	let rX = getRX(constant);
+	let rY = getRY(constant);
+	registersNum[rX] = registersNum[rX] & registersNum[rY];
+}

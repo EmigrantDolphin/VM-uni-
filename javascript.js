@@ -1,10 +1,10 @@
 const commandsArr = ["INC 01", "DEC 02", "MOV 03", "MOVC 04", "LSL 05", "LSR 06", "JMP 07", 
 					 "JZ 08", "JNZ 09", "JFE 0a", "RET 0b", "ADD 0c", "SUB 0d", "XOR 0e", 
-					 "OR 0f", "IN 10", "OUT 11"];
+					 "OR 0f", "IN 10", "OUT 11", "RAND 12", "AND 13"];
 var fileUploadTemplate = "";
-var programNum = [];
-var registersNum = [];
-const registerNum = 16;
+var programNum = new Uint8Array(256);
+var programNumUsed = 0;
+var registersNum = new Uint8Array(16);
 var curCommandAddress = 0;
 var inputData = "";
 var inputDataHead = 0;
@@ -28,7 +28,7 @@ function onLoad(){
 
 function fillRegisterLine(){
 	let text = "";
-	for (var i = 0; i < registerNum; i++){
+	for (var i = 0; i < registersNum.length; i++){
 		registersNum[i] = parseInt("00",16);
 		if (registersNum[i].toString(16).length === 1)
 			text += `<span id="reg${i}" class="border" style="display:inline-block;width:${100/20}%;margin:1px">0${registersNum[i].toString(16)}</span>`;
@@ -52,8 +52,9 @@ function fastButton(){
 }
 
 function resetButton(){
-	programNum = [];
-	registersNum = [];
+	programNum = new Uint8Array(256);
+	programNumUsed = 0;
+	registersNum = new Uint8Array(16);
 	curCommandAddress = 0;
 	inputData = "";
 	inputDataHead = 0;
@@ -135,15 +136,25 @@ function nextButton(){
 			break;
 		case 16:
 			IN(registersNum, programNum[curCommandAddress+1], inputData, inputDataHead);
-			inputDataHead++;
 			curCommandAddress += 2;
 			if (inputDataHead >= inputData.length)
 				eofFlag = true;
+			inputDataHead++;
 			break;
 		case 17:
 			outputData += OUT(registersNum, programNum[curCommandAddress+1]);
 			curCommandAddress += 2;
 			break;
+		case 18:
+			RAND(registersNum, programNum[curCommandAddress+1]);
+			curCommandAddress += 2;
+			break;
+		case 19:
+			AND(registersNum, programNum[curCommandAddress+1]);
+			curCommandAddress += 2;
+			break;
+		default:
+			console.log("WHAT THE ACTUAL FUCK");
 	}
 	if (!fastMode){
 		updateRegisters();
@@ -172,7 +183,7 @@ function updateCommandList(){
 
 function updateProgram(){
 	let text = "";
-	for (var i = 0; i < programNum.length; i++){
+	for (var i = 0; i < programNumUsed; i++){
 		if (curCommandAddress === i){
 			if (programNum[i].toString(16).length === 1)
 				text += `<span style="background-color: yellow">0${programNum[i].toString(16)} </span>`;
@@ -210,10 +221,11 @@ function getBinFile(e){
 	reader.onload = (evt) => {
 		let res = evt.target.result;
 		var text = "";
+		programNumUsed = evt.target.result.length;
 		for (var i = 0; i < res.length; i++)
 			programNum[i] = res.charCodeAt(i);
 
-		for (var i = 0; i < programNum.length; i++){
+		for (var i = 0; i < programNumUsed; i++){
 			if (programNum[i].toString(16).length === 1)
 				text += "0" + programNum[i].toString(16) + " ";
 			else

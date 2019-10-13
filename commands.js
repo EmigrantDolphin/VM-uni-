@@ -1,25 +1,21 @@
 function getRX(constant){
 	let rX = 0;
-	rX = constant | parseInt("11110000", 2);
-	rX = rX ^ parseInt("11110000", 2);
+	rX = constant & parseInt("00001111", 2);
 	return rX;
 }
 function getRY(constant){
 	let rY = 0;
-	rY = constant | parseInt("00001111", 2);
-	rY = rY ^ parseInt("00001111", 2);
+	rY = constant & parseInt("11110000", 2);
 	rY = rY >>> 4;
 	return rY;
 }
 function INC(registersNum, constant){
 	let rX = getRX(constant);	
 	registersNum[rX] += 1; 
-	console.log("INC: " + registersNum[rX]);
 }
 function DEC(registersNum, constant){
 	let rX = getRX(constant);
 	registersNum[rX] -= 1; 
-	console.log("DEC: " + registersNum[rX]);
 }
 function MOV(registersNum, constant){
 	let rX = getRX(constant);
@@ -41,7 +37,6 @@ function JMP(curCommandAddress, constant){
 	curCommandAddress += constant;
 	if (curCommandAddress + constant > 255)		
 		curCommandAddress -= 256;
-	
 	return curCommandAddress;
 }
 function JZ(curCommandAddress, constant, flag){

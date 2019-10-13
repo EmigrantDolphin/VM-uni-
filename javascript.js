@@ -26,19 +26,6 @@ function onLoad(){
 	document.getElementById("dataFile").addEventListener('change', getDataFile, false);
 }
 
-function fillRegisterLine(){
-	let text = "";
-	for (var i = 0; i < registersNum.length; i++){
-		registersNum[i] = parseInt("00",16);
-		if (registersNum[i].toString(16).length === 1)
-			text += `<span id="reg${i}" class="border" style="display:inline-block;width:${100/20}%;margin:1px">0${registersNum[i].toString(16)}</span>`;
-		else
-			text += `<span id="reg${i}" class="border" style="display:inline-block;width:${100/20}%;margin:1px">${registersNum[i].toString(16)}</span>`;
-
-	}
-	document.getElementById("registerLine").innerHTML = text;
-}
-
 function runButton(){
 	interval = setInterval(nextButton, intervalDuration);
 }
@@ -75,7 +62,6 @@ function resetButton(){
 }
 
 function nextButton(){	
-
 	switch (programNum[curCommandAddress]){
 		case 1:
 			INC(registersNum, programNum[curCommandAddress+1]);
@@ -153,8 +139,6 @@ function nextButton(){
 			AND(registersNum, programNum[curCommandAddress+1]);
 			curCommandAddress += 2;
 			break;
-		default:
-			console.log("WHAT THE ACTUAL FUCK");
 	}
 	if (!fastMode){
 		updateRegisters();
@@ -246,4 +230,29 @@ function fillCommandList(){
 	function commandsArrLoop(item, index){
 		text += "<div>" + item + "</div>";
 	}
+}
+function fillRegisterLine(){
+	let text = "";
+	for (var i = 0; i < registersNum.length; i++){
+		registersNum[i] = parseInt("00",16);
+		if (registersNum[i].toString(16).length === 1)
+			text += `<span id="reg${i}" class="border" style="display:inline-block;width:${100/20}%;margin:1px">0${registersNum[i].toString(16)}</span>`;
+		else
+			text += `<span id="reg${i}" class="border" style="display:inline-block;width:${100/20}%;margin:1px">${registersNum[i].toString(16)}</span>`;
+
+	}
+	document.getElementById("registerLine").innerHTML = text;
+}
+
+function download() {
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(outputData));
+	element.setAttribute('download', "q1_encr_2.txt");
+
+	element.style.display = 'none';
+	document.body.appendChild(element);
+
+	element.click();
+
+	document.body.removeChild(element);
 }

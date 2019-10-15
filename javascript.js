@@ -217,6 +217,8 @@ function getBinFile(e){
 			
 		}
 		document.getElementById("program").innerHTML = text;
+		updateProgram();
+		updateCommandList();
 	}
 	reader.readAsBinaryString(e.target.files[0]);
 }
